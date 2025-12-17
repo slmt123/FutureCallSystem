@@ -1,5 +1,7 @@
 # FutureCall System (UE Plugin)
 
+[English](https://github.com/slmt123/FutureCallSystem/blob/main/README.md)
+
 **FutureCall** 是为 Unreal Engine 设计的异步依赖解析与执行系统（Asynchronous Dependency Resolution System）。
 
 它通过中心化的“票据 (Ticket)”机制将**数据的提供者 (Provider)** 与**逻辑的消费者 (Consumer)** 在时间上解耦，旨在减少初始化顺序相关的问题与频繁的空指针检查。
