@@ -61,6 +61,8 @@ UFutureCallSubsystem* FC = GetGameInstance()->GetSubsystem<UFutureCallSubsystem>
 
 FC->FutureCall(this, 
     // Callback: Parameters must be UObject derived classes
+    // If additional variables of other types are required,
+    // use lambda capture or member variables to access them
     [](AMyHeroCharacter* Hero){
         UE_LOG(LogTemp, Log, TEXT("Hero ready: %s"), *Hero->GetName());
     }, 
