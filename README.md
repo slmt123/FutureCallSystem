@@ -24,6 +24,17 @@ A Consumer submits a Ticket (FutureCall), declaring several Providers it depends
 * **Loop-safe Delay**: A delay call solution (`DelayCall`) that replaces native Delay. It automatically binds to the Caller's lifecycle—if the Caller is destroyed, the delayed callback is automatically cancelled.
 * **Thread Friendly**: `RegisterProvider` supports being called from worker threads; the system internally marshals it to the GameThread for safe execution.
 
+### 2.1 System Requirements
+
+* **Pure Blueprint Projects**: Plug and play; no action required.
+* **C++ Projects**:
+    * **UE 5.3 and above**: The engine uses C++20 by default. **No configuration is needed**.
+    * **UE 4.26 - 5.2**: Since the plugin headers utilize C++17 template features, you **must** explicitly enable C++17 support in your main game module's `Build.cs`. Otherwise, compilation errors may occur:
+
+```csharp
+// Add this to your project's Build.cs:
+CppStandard = CppStandardVersion.Cpp17;
+```
 ---
 
 ## 3. Quick Start
@@ -140,6 +151,40 @@ Subsystem->FutureCall(this,
     TFutureKey<AProviderActor>("ServiceC")
 );
 ```
+
+### 4.4 Polymorphic Matching & Overwriting Strategy
+
+FutureCall supports **Polymorphic Dependency Injection**. This means if a Ticket is waiting for a parent class (e.g., `AWeapon`), but you register a subclass (e.g., `APistol`), the system will automatically match and succeed.
+
+**Overwriting Rules**:
+To resolve ambiguity regarding "which object serves as the Provider when multiple subclass instances exist," the system adopts the following strategy:
+
+When **Tags are identical**, if an **Inheritance Relationship** exists between the **Newly Registered Object (New)** and the **Existing Object (Old)** (regardless of whether `New` is a subclass of `Old` or `Old` is a subclass of `New`), **the New object will overwrite the Old object**.
+
+**High-Risk Warning: Parent Overwriting Child**
+
+Consider the following design scenario:
+1. There is an `APistol`, which is not an abstract base class.
+2. Later, `APistolProMaxUltra` is added, inheriting from `APistol`.
+3. A Ticket depends on `APistolProMaxUltra`. Without using a specific `Tag` to distinguish them, registering an `APistol` can also trigger this Ticket (due to the overwrite logic).
+4. The Ticket's callback signature expects `APistolProMaxUltra* Instance`. The system will attempt to inject the `APistol* Instance` into the `APistolProMaxUltra*` parameter.
+5. This leads to a **Cast Failure**, causing the callback to fail or produce errors.
+
+Although the system permits bidirectional overwriting, **using a parent class instance to overwrite a registered subclass instance** (e.g., `APistol` overwriting `APistolProMaxUltra`) is a **High-Risk** operation.
+
+**Potential Risks**:
+Since `UObject` is the base class for all objects, this creates a potential risk:
+1. You register a basic `UObject` (Tag="MyData").
+2. Subsequently, you register an `AActor` (Tag="MyData").
+3. Since `AActor` is a subclass of `UObject`, the system detects an inheritance relationship, and **the `AActor` will directly overwrite the previous `UObject`**.
+4. At this point, if a Ticket specifically requested the original `UObject`, it will now receive the new `AActor`. While technically compatible, this may lead to logic issues or assertion failures depending on your specific needs.
+
+**Best Practices**:
+* **In these cases, the Tag is the core differentiator.**
+* If you do not want two objects to overwrite each other, **you must use different Tags**.
+* Only register with the same Tag if you explicitly intend to "update" or "replace" the object in that logical slot (e.g., a player switches weapons, and the new weapon replaces the old one).
+
+In scenarios involving concrete class inheritance, please **carefully review your architectural design** to ensure this overwriting behavior aligns with your expectations.
 
 ---
 
