@@ -58,13 +58,13 @@ Subsystem->RegisterProvider(this, "Player1");
 **Lambda Style**:
 ```cpp
 UFutureCallSubsystem* FC = GetGameInstance()->GetSubsystem<UFutureCallSubsystem>();
-
+int32 MyInt = 10;
 FC->FutureCall(this, 
     // Callback: Parameters must be UObject derived classes
     // If additional variables of other types are required,
     // use lambda capture or member variables to access them
-    [](AMyHeroCharacter* Hero){
-        UE_LOG(LogTemp, Log, TEXT("Hero ready: %s"), *Hero->GetName());
+    [MyInt](AMyHeroCharacter* Hero){
+        UE_LOG(LogTemp, Log, TEXT("Hero ready: %s, MyInt is: %d"), *Hero->GetName(), MyInt);
     }, 
     // Dependency declaration: Type must match the parameter
     TFutureKey<AMyHeroCharacter>(NAME_None)
