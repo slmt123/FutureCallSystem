@@ -25,15 +25,18 @@ Consumer 提交一张 Ticket（FutureCall），声明它依赖的若干 Provider
 * **线程友好**：`RegisterProvider` 支持在工作线程调用，内部会 marshal 到 GameThread 安全执行。
 
 ### 2.1 系统要求
-
+* **UE 版本**：UE 4.26-5.7。
 * **纯蓝图项目**：无需任何操作，即插即用。
 * **C++ 项目**：
     * **UE 5.3 及以上**：引擎默认使用 C++20，**无需配置**。
-    * **UE 4.26 - 5.2**：由于插件头文件包含 C++17 模板特性，您**需要**在主游戏模块的 `Build.cs` 中显式开启 C++17 支持，否则可能产生编译错误：
+    * **UE 5.0 - 5.2**：引擎默认使用 C++17，**无需配置**。
+    * **UE 4.26 - 4.27**：由于插件头文件包含 C++17 模板特性，您**需要**在主游戏模块的 `Build.cs` 中显式开启 C++17 支持，否则可能产生编译错误：
 ```csharp
 // 在您游戏项目的 Build.cs 中添加：
 CppStandard = CppStandardVersion.Cpp17;
 ```
+**UE 4.26 - 4.27 不支持 Mac/iOS**，除非你能在 Mac 环境里面启用C++17。在 Fab 审核的 Mac 环境中，我通过`Build.cs`指定的`CppStandardVersion.Cpp17`没有正确生效。
+
 ---
 
 ## 3. 快速开始
