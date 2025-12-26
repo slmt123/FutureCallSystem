@@ -25,16 +25,20 @@ A Consumer submits a Ticket (FutureCall), declaring several Providers it depends
 * **Thread Friendly**: `RegisterProvider` supports being called from worker threads; the system internally marshals it to the GameThread for safe execution.
 
 ### 2.1 System Requirements
-
+* **UE Version**: UE 4.26–5.7.
 * **Pure Blueprint Projects**: Plug and play; no action required.
 * **C++ Projects**:
-    * **UE 5.3 and above**: The engine uses C++20 by default. **No configuration is needed**.
-    * **UE 4.26 - 5.2**: Since the plugin headers utilize C++17 template features, you **must** explicitly enable C++17 support in your main game module's `Build.cs`. Otherwise, compilation errors may occur:
-
+    * **UE 5.3 and above**: The engine uses C++20 by default, **no configuration is required**.
+    * **UE 5.0 – 5.2**: The engine uses C++17 by default, **no configuration is required**.
+    * **UE 4.26 – 4.27**: Since the plugin headers rely on C++17 features, you **must** explicitly enable C++17 support in your main game module’s `Build.cs`, otherwise compilation errors may occur:
 ```csharp
-// Add this to your project's Build.cs:
+// Add the following to your project's Build.cs:
 CppStandard = CppStandardVersion.Cpp17;
 ```
+**UE 4.26 – 4.27 does not support macOS/iOS** unless you are able to successfully enable C++17 in a macOS build environment.
+
+In the Fab review macOS environment, specifying `CppStandardVersion.Cpp17` in `Build.cs` did not take effect as expected in my submission.
+
 ---
 
 ## 3. Quick Start
